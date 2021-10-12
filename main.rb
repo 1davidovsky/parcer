@@ -12,7 +12,7 @@ puts 'Подождите, идет запись товаров...'
 counter = 1
 CSV.open(file_name, 'wb') do |csv_file|
   csv_file << %w[Название Цена Изображение]
-  counter += 1
+
   products_url.each do |url|
     current_url = Curl.get(url)
     current_html = Nokogiri::HTML(current_url.body)

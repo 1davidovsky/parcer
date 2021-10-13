@@ -3,16 +3,18 @@
 require 'curb'
 require 'nokogiri'
 require 'csv'
+
 url = Curl.get('https://www.petsonic.com/farmacia-para-gatos/')
 html = Nokogiri::HTML(url.body)
 products_url = html.xpath("//div/div/link[@itemprop='url']/@href")
 print 'Введите имя файла:'
 file_name = "#{gets.chomp}.csv"
-puts 'Подождите, идет запись товаров...'
-counter = 1
-CSV.open(file_name, 'wb') do |csv_file|
-  csv_file << %w[Название Цена Изображение]
 
+puts 'Подождите, идет запись товаров...'
+# CSV.open(file_name, 'wb') do |csv_file|
+#   csv_file << %w[Название Цена Изображение]
+header = %w[Name Price Image]
+CSV.open(file_name, 'a+') do |csv|
   products_url.each do |url|
     current_url = Curl.get(url)
     current_html = Nokogiri::HTML(current_url.body)
@@ -21,14 +23,19 @@ CSV.open(file_name, 'wb') do |csv_file|
     product_weight_attribute = current_html.xpath('//span[@class="radio_label"]')
     product_weight_attribute.each do |each_weight|
       product_weight = each_weight
-      product_price_attribute = each_weight.xpath('//span[@class="price_comb"]')
+      product_price_attribute = current_html.xpath('//span[@class="price_comb"]')
       product_price_attribute.each do |each_price|
         product_price = each_price
-        full_info = ["#{product_name.text} - #{product_weight.text}", product_price.text, product_img]
-        puts full_info
-        puts "#{counter} товар записан, идет запись следующего товара..."
-        counter += 1
-        csv_file << full_info
+        row = CSV::Row.new(header, [])
+        row['Price'] = product_price.text.to_s
+        row['Name'] = "#{product_name.text} - #{product_weight.text}"
+        row['Image'] = product_img.text.to_s
+        csv << row
+
+        # full_info = ["#{product_name.text} - #{product_weight.text}", product_price.text, product_img]
+        # puts full_info
+        # puts 'Товар записан, идет запись следующего товара...'
+        # csv_file << full_info
       end
     end
   end

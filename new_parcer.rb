@@ -3,35 +3,65 @@
 require 'curb'
 require 'nokogiri'
 require 'csv'
-puts 'Укажите ссылку на категорию'
-link = gets.chomp
 
+def save_info(arr)
+  CSV.open('result_of_parsing.csv', 'a+') do |csv_file|
+    csv_file << %w[Name Price Image] if csv_file.count.zero?
+    csv_file << arr
+  end
+end
 
-def save_info(name, weight, img, price)
-  weight.each_with_index do |w, index|
-    CSV.open('test.csv', 'a+') do |csv_file|
-      csv_file << %w[Название Цена Вес] if csv_file.count.zero?
-      csv_file << ["#{name&.text} - #{w&.text}", price[index]&.text.to_s, img.to_s]
-      puts ["#{name&.text} - #{w&.text}", price[index]&.text.to_s, img.to_s]
+def data(html)
+  html.xpath("//ul[@id='product_list']//a[@class='product-name']").each do |item|
+    products(item.xpath('./@href'))
+  end
+end
+
+def products(url)
+  http = Curl.get(url.to_s)
+  html = Nokogiri::HTML(http.body)
+  name = html.xpath("//h1[@class='product_main_name']/text()").to_s.strip!
+  img = html.xpath("//img[@id='bigpic']/@src")
+  weight_attr = html.xpath("//div[@class='attribute_list']/ul/li")
+  conditions(name, img, weight_attr, html)
+end
+
+def conditions(name, img, weight_attr, html)
+  if weight_attr.length.positive?
+    weight_attr.each do |weight|
+      name_full = "#{name} - #{weight.xpath("./label/span[@class='radio_label']/text()")}"
+      price = weight.xpath("./label/span[@class='price_comb']/text()")
+      save_info([name_full, price, img])
+    end
+  else
+    price = html.xpath("//span[@id='our_price_display']/text()")
+    if name.to_s.empty? || price.to_s.empty? || img.to_s.empty?
+      puts 'Вы указали пустую ссылку('
+    else
+      save_info([name, price, img])
     end
   end
 end
 
-def product(html_body)
-  name = html_body.xpath('//h1[@class="product_main_name"]')
-  weight = html_body.xpath('//span[@class="radio_label"]')
-  price = html_body.xpath('//span[@class="price_comb"]')
-  img = html_body.xpath('//img[@id="bigpic"]/@src')
+puts 'Запись началась, ожидайте...'
+page = 1
+http = Curl.get('https://www.petsonic.com/farmacia-para-gatos/')
+html = Nokogiri::HTML(http.body)
 
-  save_info(name, weight, img, price)
+last_page = html.xpath("//ul[contains(@class, 'pagination')]/li[position() = (last() - 1)]/a/span/text()").to_s
+
+loop do
+  puts "Запись со страницы №#{page}"
+  data(html)
+  page += 1
+  if page <= last_page.to_i
+    http = Curl.get("https://www.petsonic.com/farmacia-para-gatos/?p=#{page}")
+    html = Nokogiri::HTML(http.body)
+  else
+    puts "Запись была закончена на странице:#{page - 1}."
+    break
+  end
 end
 
 
-# https://www.petsonic.com/farmacia-para-gatos/
 
-
-# https://www.petsonic.com/farmacia-para-gatos/
-# prod_num = html.xpath('//h1[@class="product_main_name"]').size
-# (0..prod_num).each do num
-# nameArr = name
-#

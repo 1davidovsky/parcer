@@ -71,4 +71,5 @@ puts 'Запись со страницы №1'
 last_page.times do |page|
   puts "Запись со страницы № #{page + 2}"
   html_and_use_xpath(page)
+
 end

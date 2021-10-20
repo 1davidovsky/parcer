@@ -1,6 +1,6 @@
 ---
 URL: 'https://www.petsonic.com/farmacia-para-gatos/'
-FILE_NAME: 'tembor'
+FILE_NAME: 'nokogiri.csv'
 PRODUCTS_COUNT: "//input[@name = 'n']/@value"
 PRODUCTS_DATA: "//ul[@id='product_list']//a[@class='product-name']"
 PRODUCTS_IMAGE: '//img[@id="bigpic"]/@src'
@@ -9,3 +9,4 @@ PRODUCT_ATTRIBUTES_TABLE: '//div[@id="attributes"]//ul'
 PRODUCT_ATTRIBUTES_VARIATIONS: "//div[@class='attribute_list']/ul/li"
 PRODUCTS_WEIGHT: "./label/span[@class='radio_label']/text()"
 PRODUCTS_PRICE: "./label/span[@class='price_comb']/text()"
+PRODUCTS_NAME: "//h1[@class = 'product_main_name']/text()"

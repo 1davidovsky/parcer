@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 
-require_relative 'module'
+require_relative 'create_module'
 require_relative 'yaml_load'
 
 class Parser

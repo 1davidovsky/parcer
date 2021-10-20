@@ -10,6 +10,7 @@ require_relative 'yaml_load'
 
 module Functions
 
+  YML = YAML.load(File.read('arguments.yaml'))
   CATEGORY_LINK = YML['URL']
 
   def get_html(url)

@@ -1,6 +1,6 @@
 ---
 URL: 'https://www.petsonic.com/farmacia-para-gatos/'
-FILE_NAME: 'nokogiri.csv'
+FILE_NAME: 'res.csv'
 PRODUCTS_COUNT: "//input[@name = 'n']/@value"
 PRODUCTS_DATA: "//ul[@id='product_list']//a[@class='product-name']"
 PRODUCTS_IMAGE: '//img[@id="bigpic"]/@src'
